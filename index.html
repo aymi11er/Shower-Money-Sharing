@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Collabo allows students to collaborate across the country.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Shower App</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <!--<link rel="stylesheet" href="styles.css">-->
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+</head>
+<body>
+<div>
+    <h1>Welcome to the Shower-Money Splitting App</h1>
+    <h5> Enter the names and amounts.<br>Please use the format below:</h5>
+    <form action="#">
+        <div class="mdl-textfield mdl-js-textfield">
+            <textarea class="mdl-textfield__input" type="text" rows= "3" id="input" ></textarea>
+            <label class="mdl-textfield__label" for="input">Aliza Miller $32.50<br>Hanna J $27.50<br>Ariella Kobowabi $0</label>
+        </div>
+    </form>
+    <!-- Accent-colored raised button with ripple -->
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="submit" onclick="submitNames()">
+        Submit
+    </button>
+</div>
+<div id="answer">
+    <h5 id="anstext"></h5>
+</div>
+</body>
+    <script>
+        function submitNames(){
+            var tot = 0;
+            var aver = 0;
+            var need2BeGiven = [];
+            var need2Pay = [];
+            var finalPayments = [];
+            var input = document.getElementById("input").value;
+            var sepParts = input.split(/\r?\n/);
+            for (var i in sepParts) {
+                document.getElementById("answer").innerHTML += "<br><h5>"+sepParts[i]+"</h5>";
+                var amount = parseFloat(sepParts[i].split('$')[1]);
+                console.log(amount);
+                tot += amount;
+            }
+            aver = tot/sepParts.length;
+            console.log("average: "+aver);
+            console.log("total: "+tot);
+
+            for (var i in sepParts) {
+                document.getElementById("answer").innerHTML += "<br><h5>"+sepParts[i]+"</h5>";
+                if (sepParts[i].split('$').length != 2){ //basic error handling
+                    document.getElementById("answer").innerHTML = "You must have one $ sign followed by an amount on each line";
+                    return;
+                }
+
+                var person = sepParts[i].split('$')[0];
+                var amount = parseFloat(sepParts[i].split('$')[1]) - aver; //negative means they owe money, positive means they're owed money
+                console.log(person+" owes "+amount);
+                if (amount < 0){
+                    need2Pay.push([amount,person]); //instead of lst
+                }else if (amount>0){
+                    need2BeGiven.push([amount,person]);
+                }else{
+                    finalPayments.push(["0.00",person, "No One"]);
+                }
+            }
+            console.log(need2Pay);
+            while (need2Pay.length != 0){
+                var payTo = need2BeGiven.pop();
+                console.log(payTo);
+                var payer = need2Pay.pop();
+                console.log(payer);
+                if (Math.abs(payer[0]) > payTo[0]){
+                    finalPayments.push([payTo[0],payer[1], payTo[1]]);
+                    need2Pay.push([(payer[0]+payTo[0]),payer[1]]); // updating how much s/he now owes
+                } else if (Math.abs(payer[0]) < payTo[0]) {
+                    finalPayments.push([Math.abs(payer[0]),payer[1], payTo[1]]);
+                    need2BeGiven.push([(payer[0]+payTo[0]),payTo[1]]); // updating how much s/he now owes
+                } else { // they are equal
+                    finalPayments.push([Math.abs(payer[0]),payer[1], payTo[1]]);
+                }
+            }
+            var ans = "";
+            console.log(finalPayments.length);
+            console.log(finalPayments[0]);
+            for (var i in finalPayments) {
+                ans += "<h5>"+finalPayments[i][1]+" owes "+finalPayments[i][2]+" $"+finalPayments[i][0]+"</h5><br>";
+            }
+            console.log(ans);
+            document.getElementById("answer").innerHTML = ans;
+        }
+
+        function calcAmount(){
+            var partsOfStr = str.split('/n');
+
+            var partsOfStr = str.split(',');
+        }
+    </script>
+    <style>
+    body {
+        margin: 10%;
+    }
+
+    h1 {
+        font-size: xx-large;
+        color: deeppink;
+        font-family: "Apple Chancery";
+    }
+    </style>
+</html>
